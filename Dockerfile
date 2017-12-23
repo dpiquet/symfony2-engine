@@ -12,14 +12,13 @@ ARG NODEJS_VERSION=8.9.3
 
 # Install PHP dependencies
 RUN set -xe \
-    && apk add --no-cache git openssh-client coreutils freetype-dev libjpeg-turbo-dev libltdl libmcrypt-dev libpng-dev icu icu-libs icu-dev unzip libstdc++ \
-    && apk add --no-cache --virtual tic-bdeps gcc g++ postgresql-dev binutils-gold libgcc linux-headers make python \
+    && apk add --no-cache git subversion openssh-client coreutils libltdl icu icu-libs unzip libstdc++ libpng libjpeg-turbo postgresql-client libpng freetype libmcrypt \
+    && apk add --no-cache --virtual tic-bdeps gcc g++ postgresql-dev binutils-gold libgcc linux-headers make python libmcrypt-dev libpng-dev libjpeg-turbo-dev freetype-dev icu-dev \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) iconv mbstring mcrypt intl pdo_pgsql gd zip bcmath \
     && docker-php-source delete
 
-
-# Installation de composer
+# Install composer
 RUN php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/local/bin --filename=composer \
     && chmod +x /usr/local/bin/composer
 
@@ -38,7 +37,7 @@ RUN echo "Installs node" \
     && rm node.tar.xz \
     && rm -Rf node-v${NODEJS_VERSION}
 
-# Delete build dependencies
+# Suppression des dépendances de build
 RUN apk del tic-bdeps
 
 # Creation utilisateur PHP
