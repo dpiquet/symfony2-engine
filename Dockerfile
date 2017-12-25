@@ -37,6 +37,4 @@ RUN set -xe \
     && rm node.tar.xz \
     && rm -Rf node-v${NODEJS_VERSION} \
     # Suppression des dépendances de build
-    && apk del tic-bdeps \
-    # Creation utilisateur PHP
-    && adduser php-fpm -H -u ${PHP_UID} -G nobody -h /home/docker -g none -D
+    && apk del tic-bdeps
