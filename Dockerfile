@@ -1,12 +1,6 @@
 FROM php:5.6-fpm-alpine
 MAINTAINER Damien PIQUET <dpiquet@teicee.com>
 
-# UID 
-ENV PHP_UID=1000
-
-# GID
-ENV PHP_GID=65534
-
 # Node JS version
 ARG NODEJS_VERSION=8.9.3
 
