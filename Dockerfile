@@ -1,13 +1,18 @@
-FROM php:5.6-fpm-alpine
+FROM node:9.3 as node
+
+FROM php:5.6-apache
 MAINTAINER Damien PIQUET <dpiquet@teicee.com>
 
-# Node JS version
-ARG NODEJS_VERSION=8.9.3
+# Copy nodejs from node image
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /opt/yarn /opt/yarn
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=node /usr/local/bin /usr/local/bin
 
 RUN set -xe \
     # Install PHP dependencies
-    && apk add --no-cache git subversion openssh-client coreutils libltdl icu icu-libs unzip libstdc++ libpng libjpeg-turbo postgresql-client libpng freetype libmcrypt \
-    && apk add --no-cache --virtual tic-bdeps autoconf gcc g++ postgresql-dev binutils-gold libgcc linux-headers make python libmcrypt-dev libpng-dev libjpeg-turbo-dev freetype-dev icu-dev libc-dev \
+    && apt-get update && apt-get install -y git subversion openssh-client coreutils unzip postgresql-client \
+    && apt-get install -y autoconf gcc g++ libpq-dev binutils-gold libgcc1 linux-headers-amd64 make python libmcrypt-dev libpng-dev libjpeg-dev libc-dev libfreetype6-dev libmcrypt-dev libicu-dev \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
 
     # Install Xdebug
@@ -22,24 +27,14 @@ RUN set -xe \
     # Install composer
     && php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/local/bin --filename=composer \
     && chmod +x /usr/local/bin/composer \
-    && echo "Installing Nodejs" \
 
-
-    # Install Nodejs (less and uglifyjs)
-    && curl -L -o node.tar.xz https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}.tar.xz \
-    && tar -xvf node.tar.xz \
-    && cd node-v${NODEJS_VERSION}/ \
-    && ./configure \
-    && make -j$(getconf _NPROCESSORS_ONLN) \
-    && make install \
-    && echo "Installs node" \
+    # Install nodejs packages
     && npm install -g less \
     && npm install -g uglify-js \
     && npm install -g uglifycss \
-    && cd ../ \
-    && rm node.tar.xz \
-    && rm -Rf node-v${NODEJS_VERSION} \
-
 
     # Suppression des dépendances de build
-    && apk del tic-bdeps
+    && apt-get remove -y autoconf gcc g++ libpq-dev linux-headers-amd64 make libmcrypt-dev libicu-dev \
+    && apt-get clean
+
+EXPOSE 80
