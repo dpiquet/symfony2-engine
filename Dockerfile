@@ -36,6 +36,9 @@ RUN set -xe \
     && npm install -g uglify-js \
     && npm install -g uglifycss \
 
+    # Enable httpd mod_rewrite
+    && a2enmod rewrite
+
     # Suppression des dépendances de build
     && apt-get remove -y autoconf gcc g++ libpq-dev linux-headers-amd64 make libmcrypt-dev libicu-dev \
     && apt-get clean
