@@ -9,6 +9,9 @@ COPY --from=node /opt/yarn /opt/yarn
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node /usr/local/bin /usr/local/bin
 
+# Custom Vhost
+ADD 000-default.conf /etc/apache2/sites-available/000-default.conf
+
 RUN set -xe \
     # Install PHP dependencies
     && apt-get update && apt-get install -y git subversion openssh-client coreutils unzip postgresql-client \
